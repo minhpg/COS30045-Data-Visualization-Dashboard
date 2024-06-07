@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Data Visualisation Exercise 8.2" />
+    <meta name="keywords" content="HTML CSS JS" />
+    <meta name="author" content="Gia Minh Pham - 103808249" />
+
+    <title>
+      COVID-19 Time Series Data Australia between 22/1/2020 - 9/3/2023
+    </title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link href="./style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div
+      id="tooltip"
+      class="rounded px-5 py-3 text-sm border border-gray-200 shadow bg-white"
+      style="position: fixed; visibility: hidden"
+    >
+      <div id="tooltip-title" class="font-semibold"></div>
+      <div id="tooltip-content" class="text-gray-500"></div>
+    </div>
+    <main class="container mx-auto py-6 flex flex-col h-screen">
+      <h1 class="text-2xl font-bold">Data Visualisation - Dashboard</h1>
+      <div class="prose w-full flex-1 grid grid-cols-3 mt-6 gap-6">
+        <div class="col-span-3">
+          <div class="p-5 border border-gray-200 shadow rounded-lg">
+            <div>
+              <label
+                for="select-transition-animation"
+                class="block mb-1 text-sm font-base text-gray-500 tracking-tight"
+                >Select variable</label
+              >
+              <div
+                class="flex items-center gap-3 bg-white border border-gray-200 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-3 py-2"
+              >
+                <select
+                  id="map-var-select"
+                  class="p-0 border-transparent focus:border-transparent focus:ring-0 w-full outline-none text-sm"
+                >
+                  <option disabled class="text-gray-500">
+                    Select a variable
+                  </option>
+                  <option class="text-gray-500">Confirmed</option>
+                  <option class="text-gray-500">Deaths</option>
+                  <option class="text-gray-500">Recovered</option>
+                </select>
+              </div>
+              <figure id="map"></figure>
+              <div
+                class="flex justify-between text-sm font-base text-gray-500 tracking-tight"
+              >
+                <label for="map-date-slider">Select date</label>
+                <div id="map-date">1/12/2023</div>
+              </div>
+            </div>
+            <input
+              id="map-date-slider"
+              type="range"
+              value="100"
+              step="0.01"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="font-black p-6 text-center">
+      <div class="font-light">Gia Minh Pham & Xuan Dat Le</div>
+      <div>COS30045 Data Visualisation</div>
+    </footer>
+    <!-- Migrate to JS module and local d3 to get intellisense -->
+    <script type="module" src="script.js"></script>
+  </body>
+</html>

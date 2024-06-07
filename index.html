@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Data Visualisation Exercise 8.2" />
+    <meta name="keywords" content="HTML CSS JS" />
+    <meta name="author" content="Gia Minh Pham - 103808249" />
+
+    <title>Data Visualisation - Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link href="./styles/style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div
+      id="tooltip"
+      class="rounded px-5 py-3 text-sm border border-gray-200 shadow bg-white z-[9999]"
+      style="position: fixed; visibility: hidden"
+    >
+      <div id="tooltip-title" class="font-semibold"></div>
+      <div id="tooltip-content" class="text-gray-500"></div>
+    </div>
+    <main
+      class="max-w-6xl mx-auto px-5 my-10 flex flex-col min-h-screen prose prose-sm prose-h3:-mt-5"
+    >
+      <h1 class="font-bold">COS30045 - Data Visualisation Dashboard</h1>
+      <h2 class="-mt-6 font-light text-lg text-gray-500">
+        Interactive data visualisation for the Data Visualisation Project.
+      </h2>
+
+      <hr class="my-5 border-gray-200" />
+      <div class="flex gap-3">
+        <div>
+          <label
+            for="primary-color-scheme-select"
+            class="block mb-1 text-sm font-base text-gray-500 tracking-tight"
+            >Primary Colour Scheme</label
+          >
+          <div
+            class="flex items-center gap-3 bg-white border border-gray-200 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-0 py-2"
+          >
+            <select
+              id="primary-color-scheme-select"
+              class="p-0 border-transparent focus:border-transparent focus:ring-0 w-full outline-none text-sm"
+            >
+              <option disabled class="text-gray-500">Select a colour</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label
+            for="secondary-color-scheme-select"
+            class="block mb-1 text-sm font-base text-gray-500 tracking-tight"
+            >Secondary Colour Scheme</label
+          >
+          <div
+            class="flex items-center gap-3 bg-white border border-gray-200 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-0 py-2"
+          >
+            <select
+              id="secondary-color-scheme-select"
+              class="p-0 border-transparent focus:border-transparent focus:ring-0 w-full outline-none text-sm"
+            >
+              <option disabled class="text-gray-500">Select a colour</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="max-w-full flex-1 flex flex-col mt-5 gap-10 prose-h2:mt-0">
+        <div class="flex gap-5 lg:flex-row flex-col-reverse">
+          <div class="w-full lg:max-w-[700px]">
+            <div class="p-5 border border-gray-200 shadow rounded-lg">
+              <h3 class="!mt-0">COVID-19 Time Series Data Australia</h3>
+              <div>
+                <label
+                  for="select-transition-animation"
+                  class="block mb-1 text-sm font-base text-gray-500 tracking-tight"
+                  >Select variable</label
+                >
+                <div
+                  class="flex items-center gap-3 bg-white border border-gray-200 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-0 py-2"
+                >
+                  <select
+                    id="map-var-select"
+                    class="p-0 border-transparent focus:border-transparent focus:ring-0 w-full outline-none text-sm"
+                  >
+                    <option disabled class="text-gray-500">
+                      Select a variable
+                    </option>
+                    <option class="text-gray-500">Confirmed</option>
+                    <option class="text-gray-500">Deaths</option>
+                    <option class="text-gray-500">Recovered</option>
+                  </select>
+                </div>
+                <figure id="map" class="relative mt-10"></figure>
+
+                <div class="flex gap-3 w-full items-center">
+                  <div class="w-full">
+                    <div
+                      class="flex justify-between text-sm font-base text-gray-500 tracking-tight"
+                    >
+                      <label for="map-date-slider">Select date</label>
+                      <div id="map-date">1/12/2023</div>
+                    </div>
+                    <input
+                      id="map-date-slider"
+                      type="range"
+                      value="0"
+                      step="0.1"
+                      class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div class="flex gap-1 h-min">
+                    <button
+                      class="border border-gray-200 rounded flex items-center justify-center p-1"
+                      id="start-map-interval"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="size-4"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      id="stop-map-interval"
+                      class="border border-gray-200 rounded flex items-center justify-center p-1"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="{1.5}"
+                        stroke="currentColor"
+                        class="size-4"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15.75 5.25v13.5m-7.5-13.5v13.5"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="w-full prose-sm">
+            <h2>COVID-19 Time Series Data</h2>
+            <p>
+              This image is a choropleth map of Australia, displaying COVID-19
+              confirmed case data by state between January 22, 2020 and March 8,
+              2024. The map is color-coded to represent the number of confirmed
+              cases, with darker shades indicating higher numbers. Key details
+              from the map:
+            </p>
+            <ul>
+              <li>
+                New South Wales is highlighted with the darkest shade,
+                indicating the highest number of confirmed cases, totaling
+                3,908,129.
+              </li>
+              <li>
+                Other states and territories are colored in varying lighter
+                shades, signifying lower confirmed case counts relative to New
+                South Wales.
+              </li>
+              <li>
+                The map includes a dropdown menu for selecting different
+                variables (Confirmed, Recovered and Deaths) and a date slider at
+                the bottom for selecting specific dates within the time series
+                data.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="gap-5 flex flex-col lg:flex-row">
+          <div class="w-full prose-sm">
+            <h2>Australia's health expenditures</h2>
+            <p>
+              is a bar chart showing Australia's health expenditures as a
+              percentage of GDP from 2015 to 2022. The y-axis represents the
+              percentage of GDP, ranging from 0% to 20%, while the x-axis shows
+              the years from 2015 to 2022. Key details from the chart:
+
+              <li>
+                Each bar represents the health expenditure for a specific year.
+              </li>
+              <li>
+                There is a slight fluctuation in the percentage over the years.
+              </li>
+              <li>
+                The chart demonstrates a general trend of relatively stable
+                health expenditure percentages, with minor variations year by
+                year.
+              </li>
+            </p>
+          </div>
+          <div class="lg:max-w-[700px] w-full">
+            <div class="p-5 border border-gray-200 shadow rounded-lg h-full">
+              <div class="h-full">
+                <figure id="bar-chart" class="relative"></figure>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-5 lg:flex-row flex-col-reverse">
+          <div class="w-full lg:max-w-[700px]">
+            <div class="p-5 border border-gray-200 shadow rounded-lg">
+              <div>
+                <figure id="line-chart" class="relative"></figure>
+              </div>
+            </div>
+          </div>
+          <div class="w-full prose-sm">
+            <h2>Weekly Mortality</h2>
+            <p>
+              This line chart is showing mortality data by week in Australia
+              from 2020 to early 2024. The y-axis represents the number of
+              deaths per week, ranging from 0 to 1,000. The x-axis represents
+              the timeline from 2020 to early 2024. Key details from the chart:
+            </p>
+            <ul>
+              <li>
+                The orange line represents the number of COVID-related deaths
+                per week.
+              </li>
+              <li>
+                The shaded area under the orange line highlights the variation
+                in weekly death counts.
+              </li>
+            </ul>
+            <p>Two specific data points are labeled:</p>
+            <ul>
+              <li>
+                One indicates "Total Deaths: 4074," with a black diamond marker,
+                showing a peak in the total number of deaths. Another indicates
+                "COVID Deaths: 103," with a black circle marker, showing a
+                specific count of COVID-related deaths at a certain point in
+                time.
+              </li>
+              <li>
+                The chart includes a vertical dashed line marking a significant
+                point in the data, aligned with the labeled markers for "Total
+                Deaths" and "COVID Deaths."
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+    <button
+      class="fixed top-5 right-5 bg-white rounded-full p-2 border border-gray-200"
+      id="form-dropdown-open"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="size-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+        />
+      </svg>
+    </button>
+    <div
+      class="rounded-xl p-0 border-gray-200 border md:max-w-lg md:w-full h-96 fixed md:top-5 md:right-5 bg-white inset-5 md:left-auto"
+      id="form-dropdown"
+    >
+      <div class="h-full w-full">
+        <iframe
+          class="w-full h-full relative"
+          src="https://docs.google.com/forms/d/e/1FAIpQLSfXefT1-b0RKIVDkaMEgUuU2tghiCidjmHAmUI8kWEtwP1oDQ/viewform?embedded=true"
+        >
+        </iframe>
+        <button class="absolute top-2 right-2" id="form-dropdown-close">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18 18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <footer class="p-6 flex max-w-6xl mx-auto">
+      <div class="font-light text-gray-500">
+        Gia Minh Pham & Xuan Dat Le -
+        <span class="font-semibold text-black"
+          >COS30045 Data Visualisation</span
+        >
+      </div>
+    </footer>
+    <!-- Migrate to JS module and local d3 to get intellisense -->
+    <script type="module" src="./js/script.js"></script>
+  </body>
+</html>
