@@ -3,16 +3,16 @@ import "./d3.min.js";
 /** Create Tooltip */
 const tooltip = d3.select("#tooltip").style("visibility", "hidden");
 
+let interval = null;
 let defaultColorScheme = d3.schemeOranges;
 let defaultSecondaryColorScheme = d3.schemeBlues;
+let selectedData = "Confirmed";
+
+let scrollProgress = 0;
 
 const initTimeSeriesGraph = async () => {
-  let selectedData = "Confirmed";
-
-  let scrollProgress = 0;
-
   // AU states.json from https://github.com/rowanhogan/australian-states/blob/master/states.geojson
-  const { features, ...fields } = await d3.json("assets/states.geojson");
+  const { features } = await d3.json("assets/states.geojson");
 
   const auCovidDataConfirmed = await d3.csv(
     "assets/time_series_au_covid19_confirmed.csv"
@@ -29,16 +29,20 @@ const initTimeSeriesGraph = async () => {
     4,
     auCovidDataDeaths.columns.length - 1
   );
+
+  const dateFormatter = (date) => {
+    const comp = date.split("/");
+    return `${comp[1]}/${comp[0]}/20${comp[2]}`;
+  };
   const defaultDate = dates[0];
   let date = defaultDate;
 
   const dateSelector = d3.select("#map-date");
 
-  dateSelector.text(date);
+  dateSelector.text(dateFormatter(date));
 
   const drawGraph = () => {
     /** Graph configs */
-
     const margin = { top: 10, right: 30, bottom: 20, left: 50 };
 
     const width =
@@ -46,7 +50,7 @@ const initTimeSeriesGraph = async () => {
     const height = (width / 4) * 3;
 
     d3.select("#map").selectAll("svg").remove();
-    let svg = d3
+    const svg = d3
       .select("#map")
       .append("svg")
       .attr("width", width)
@@ -113,6 +117,7 @@ const initTimeSeriesGraph = async () => {
 
     const path = d3.geoPath().projection(projection);
     const states = svg.selectAll("path").data(mergedData, (d) => d);
+
     states
       .enter()
       .append("path")
@@ -145,28 +150,26 @@ const initTimeSeriesGraph = async () => {
       });
   };
 
-  // set progress
-  let interval = null;
-
   const startInterval = () => {
-    interval = setInterval(() => {
-      scrollProgress += 0.001;
-      const index = Math.round(scrollProgress * (dates.length - 1));
-      date = dates[index > dates.length - 1 ? dates.length - 1 : index];
-      if (index < dates.length) {
-        d3.select("#map-date-slider").property("value", scrollProgress * 100);
-        dateSelector.text(date);
-        drawGraph();
-      } else {
-        clearInterval(interval);
-      }
-    }, 10);
+    if (!interval)
+      interval = setInterval(() => {
+        scrollProgress += 0.001;
+        const index = Math.round(scrollProgress * (dates.length - 1));
+        date = dates[index > dates.length - 1 ? dates.length - 1 : index];
+        if (index < dates.length) {
+          d3.select("#map-date-slider").property("value", scrollProgress * 100);
+          dateSelector.text(dateFormatter(date));
+          drawGraph();
+        } else {
+          stopInterval(interval);
+          interval = null;
+        }
+      }, 10);
   };
-
-  startInterval();
 
   const stopInterval = () => {
     clearInterval(interval);
+    interval = null;
   };
 
   d3.select("#map-date-slider").on("input", (e) => {
@@ -174,12 +177,12 @@ const initTimeSeriesGraph = async () => {
     scrollProgress = e.target.value / 100;
     const index = Math.round(scrollProgress * (dates.length - 1));
     date = dates[index > dates.length - 1 ? dates.length - 1 : index];
-    dateSelector.text(date);
+    dateSelector.text(dateFormatter(date));
     drawGraph();
   });
 
   d3.select("#start-map-interval").on("click", (e) => {
-    if (!interval) startInterval();
+    startInterval();
   });
 
   d3.select("#stop-map-interval").on("click", (e) => {
@@ -191,7 +194,11 @@ const initTimeSeriesGraph = async () => {
     drawGraph();
   });
 
-  drawGraph();
+  setInterval(() => {
+    if (!interval) {
+      drawGraph();
+    }
+  }, 1000);
 
   return drawGraph;
 };
@@ -434,7 +441,6 @@ const initLineChart = async () => {
     svg
       .append("path")
       .datum(dataset_total)
-      // .attr("transform", `translate(0, ${-paddingY})`)
       .style("fill", "url(#gradient)") //id of the gradient for fill
       .attr("shape-rendering", "geometricPrecision")
       .attr("d", area);
@@ -470,7 +476,6 @@ const initLineChart = async () => {
       const covid = dataset_covid[xIndex];
       const total = dataset_total[xIndex2];
 
-      console.log(covid, total);
       if (!(covid && total)) return;
       svg
         .selectAll("#hoverLine")
@@ -537,12 +542,13 @@ const initGraphs = async () => {
   return [drawTimeSeries, drawBarChart, drawLineChart];
 };
 
+const drawRegisteredGraphs = (drawGraphFunctions) => {
+  for (const drawGraph of drawGraphFunctions) {
+    drawGraph();
+  }
+};
+
 const initDashboardOptions = (drawGraphFunctions) => {
-  const drawRegisteredGraphs = () => {
-    for (const drawGraph of drawGraphFunctions) {
-      drawGraph();
-    }
-  };
   const primaryColorSchemeOptions = [
     {},
     {
@@ -632,7 +638,7 @@ const initDashboardOptions = (drawGraphFunctions) => {
       (d) => d.name === e.target.value
     ).value;
     if (matchColorScheme) defaultColorScheme = matchColorScheme;
-    drawRegisteredGraphs();
+    drawRegisteredGraphs(drawGraphFunctions);
   });
 
   d3.select("#secondary-color-scheme-select").on("change", (e) => {
@@ -640,14 +646,14 @@ const initDashboardOptions = (drawGraphFunctions) => {
       (d) => d.name === e.target.value
     ).value;
     if (matchColorScheme) defaultSecondaryColorScheme = matchColorScheme;
-    drawRegisteredGraphs();
+    drawRegisteredGraphs(drawGraphFunctions);
   });
 
   addEventListener("resize", (event) => {
-    drawRegisteredGraphs();
+    drawRegisteredGraphs(drawGraphFunctions);
   });
 
-  drawRegisteredGraphs();
+  drawRegisteredGraphs(drawGraphFunctions);
 };
 
 const initFormDropdown = () => {
